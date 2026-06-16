@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter, Montserrat } from "next/font/google";
+import { AuthProvider } from "@/lib/auth";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -31,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${cormorant.variable} ${montserrat.variable} ${inter.variable}`}>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
