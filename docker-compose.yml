@@ -54,6 +54,10 @@ services:
     build: ./frontend
     command: npm run dev
     env_file: .env
+    environment:
+      # Windows + bind mount não propaga eventos inotify; polling garante o hot-reload.
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
     volumes:
       - ./frontend:/app
       - /app/node_modules

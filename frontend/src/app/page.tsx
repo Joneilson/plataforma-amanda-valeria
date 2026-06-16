@@ -1,18 +1,23 @@
+import Image from "next/image";
 import { SITE } from "@/lib/site";
+import logoStacked from "@/assets/logo-stacked.png";
 
 export default function Home() {
   return (
     <main className="min-h-screen">
-      <section className="mx-auto flex max-w-5xl flex-col items-center px-6 py-24 text-center">
-        <p className="font-brand text-sm uppercase tracking-[0.4em] text-plum-600">
-          {SITE.profissao} · {SITE.crp}
-        </p>
-
-        <h1 className="mt-6 font-display text-5xl font-medium leading-tight text-plum md:text-6xl">
-          {SITE.nome}
+      <section className="mx-auto flex max-w-5xl flex-col items-center px-6 py-20 text-center">
+        <h1 className="sr-only">
+          {SITE.nome} — {SITE.profissao} ({SITE.crp})
         </h1>
 
-        <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/80">
+        <Image
+          src={logoStacked}
+          alt={`${SITE.nome} — ${SITE.profissao}`}
+          priority
+          className="h-auto w-72 md:w-80"
+        />
+
+        <p className="mt-10 max-w-xl text-lg leading-relaxed text-ink/80">
           Um espaço de cuidado, escuta e acolhimento. Atendimento presencial em{" "}
           {SITE.endereco.cidade}/{SITE.endereco.estado} e online.
         </p>
