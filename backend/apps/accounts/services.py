@@ -42,6 +42,11 @@ class AccountService:
             ]
         )
 
+        # Cria o perfil clínico do paciente (import tardio evita acoplamento no carregamento).
+        from apps.patients.services import PatientService
+
+        PatientService.ensure_profile(user)
+
         log_event(action=AuditLog.Action.REGISTER, request=request, user=user)
         return user
 
