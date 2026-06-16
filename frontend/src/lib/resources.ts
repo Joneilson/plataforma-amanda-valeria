@@ -15,8 +15,9 @@ export const getPatientDashboard = () => api<PatientDashboard>("/dashboard/patie
 
 // ---- Pacientes ----
 export interface CreatePatientPayload {
-  email: string;
   nome: string;
+  password: string;
+  email?: string;
   telefone?: string;
   queixa_principal?: string;
   valor_sessao?: number | null;

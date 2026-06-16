@@ -8,23 +8,25 @@ from .managers import UserManager
 
 
 class User(AbstractUser):
-    """Usuário do sistema. Autenticação por e-mail; papel define o acesso."""
+    """Usuário do sistema.
+
+    O login é o `username` (padrão `nome.sobrenome`), gerado pela psicóloga
+    ao cadastrar o paciente. E-mail é opcional (usado para notificações).
+    """
 
     class Role(models.TextChoices):
         PACIENTE = "PACIENTE", "Paciente"
         PSICOLOGA = "PSICOLOGA", "Psicóloga"
 
-    # Removemos username em favor do e-mail.
-    username = None
-
-    email = models.EmailField("e-mail", unique=True)
+    # username/password herdados de AbstractUser (username é o campo de login).
+    email = models.EmailField("e-mail", blank=True, null=True)
     nome = models.CharField("nome completo", max_length=150)
     telefone = models.CharField("telefone", max_length=20, blank=True)
     role = models.CharField(
         "papel", max_length=20, choices=Role.choices, default=Role.PACIENTE
     )
 
-    USERNAME_FIELD = "email"
+    # USERNAME_FIELD = "username" (padrão do AbstractUser)
     REQUIRED_FIELDS = ["nome"]
 
     objects = UserManager()
@@ -34,7 +36,7 @@ class User(AbstractUser):
         verbose_name_plural = "usuários"
 
     def __str__(self):
-        return f"{self.nome} <{self.email}>"
+        return f"{self.nome} ({self.username})"
 
     @property
     def is_psicologa(self) -> bool:
@@ -46,10 +48,7 @@ class User(AbstractUser):
 
 
 class Consent(TimeStampedModel):
-    """Registro de consentimento aceito pelo usuário (LGPD / CFP).
-
-    Versionado: cada versão dos termos gera um aceite próprio, com data e IP.
-    """
+    """Registro de consentimento aceito pelo usuário (LGPD / CFP)."""
 
     class Type(models.TextChoices):
         TERMS = "TERMOS_USO", "Termos de uso"

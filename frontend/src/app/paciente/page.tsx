@@ -22,7 +22,7 @@ export default function PacienteDashboard() {
       <h1 className="font-display text-3xl text-plum">Olá, {user?.nome?.split(" ")[0]}</h1>
       <p className="mt-1 text-ink/60">Bem-vindo(a) à sua área de atendimento.</p>
 
-      <div className="mt-6 rounded-2xl border border-plum-200 bg-white p-6">
+      <div className="mt-6 rounded-2xl border border-plum-200 bg-white p-6 shadow-card">
         <p className="font-brand text-xs uppercase tracking-[0.2em] text-plum-600">
           Próximo atendimento
         </p>
@@ -42,7 +42,7 @@ export default function PacienteDashboard() {
         )}
       </div>
 
-      <div className="mt-4 rounded-xl border border-plum-200 bg-white p-5">
+      <div className="mt-4 rounded-xl border border-plum-200 bg-white p-5 shadow-soft">
         <p className="text-sm text-ink/60">Sessões realizadas</p>
         <p className="mt-1 font-display text-3xl text-plum">{data?.sessoes_realizadas ?? "—"}</p>
       </div>

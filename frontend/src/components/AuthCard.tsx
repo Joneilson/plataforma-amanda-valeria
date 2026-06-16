@@ -13,7 +13,7 @@ export function AuthCard({
 }) {
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-12">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm animate-fade-up">
         <Link href="/" className="mx-auto mb-8 block w-40">
           <Image
             src={logoStacked}
@@ -22,7 +22,7 @@ export function AuthCard({
             className="mx-auto h-auto w-40"
           />
         </Link>
-        <div className="rounded-2xl border border-plum-200 bg-white p-8">
+        <div className="rounded-2xl border border-plum-200 bg-white p-8 shadow-card">
           <h1 className="text-center font-brand text-xs uppercase tracking-[0.3em] text-plum-600">
             {titulo}
           </h1>

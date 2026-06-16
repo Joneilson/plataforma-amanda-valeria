@@ -1,7 +1,11 @@
 """Camada de serviços de `patients` — lógica de escrita."""
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from rest_framework.exceptions import ValidationError
+
+from apps.accounts.models import Consent
+from apps.accounts.services import generate_username
+from apps.audit.models import AuditLog
+from apps.audit.services import get_client_ip, log_event
 
 from .models import Patient
 
@@ -13,28 +17,44 @@ class PatientService:
 
     @staticmethod
     def ensure_profile(user) -> Patient:
-        """Garante que um usuário paciente tenha perfil clínico (idempotente)."""
         patient, _ = Patient.objects.get_or_create(user=user)
         return patient
 
     @staticmethod
     @transaction.atomic
-    def create_with_account(*, email: str, nome: str, telefone: str = "", **clinical) -> Patient:
-        """Cria a conta do paciente (sem senha utilizável) + o perfil clínico.
+    def create_with_account(
+        *, nome: str, password: str, email: str | None = None, telefone: str = "", request=None, **clinical
+    ) -> Patient:
+        """Cria a conta do paciente (login `nome.sobrenome`) + perfil clínico.
 
-        O paciente define a senha depois via "recuperar senha".
+        A psicóloga define a senha inicial e o login é gerado automaticamente.
         """
-        if User.objects.filter(email__iexact=email).exists():
-            raise ValidationError({"email": "Já existe uma conta com este e-mail."})
-
         user = User.objects.create_user(
-            email=email.lower(),
-            password=None,  # senha inutilizável até o paciente redefinir
+            username=generate_username(nome),
+            password=password,
             nome=nome,
+            email=(email or None),
             telefone=telefone,
             role=User.Role.PACIENTE,
         )
-        return Patient.objects.create(user=user, **clinical)
+
+        ip = get_client_ip(request)
+        Consent.objects.bulk_create(
+            [
+                Consent(user=user, tipo=tipo, ip=ip)
+                for tipo in (Consent.Type.TERMS, Consent.Type.PRIVACY)
+            ]
+        )
+
+        patient = Patient.objects.create(user=user, **clinical)
+        log_event(
+            action=AuditLog.Action.REGISTER,
+            request=request,
+            user=user,
+            resource="patient",
+            resource_id=patient.id,
+        )
+        return patient
 
     @staticmethod
     def update(patient: Patient, **fields) -> Patient:

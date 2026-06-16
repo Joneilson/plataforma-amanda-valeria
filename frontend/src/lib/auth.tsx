@@ -5,14 +5,6 @@ import { api } from "./api";
 import { tokenStore } from "./auth-tokens";
 import type { Role, User } from "./types";
 
-interface RegisterPayload {
-  nome: string;
-  email: string;
-  password: string;
-  telefone?: string;
-  accept_terms: boolean;
-}
-
 interface AuthData {
   access: string;
   refresh: string;
@@ -22,8 +14,7 @@ interface AuthData {
 interface AuthState {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<User>;
-  register: (payload: RegisterPayload) => Promise<User>;
+  login: (username: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
 }
 
@@ -50,20 +41,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })();
   }, []);
 
-  async function login(email: string, password: string) {
+  async function login(username: string, password: string) {
     const data = await api<AuthData>("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
-    tokenStore.set(data.access, data.refresh);
-    setUser(data.user);
-    return data.user;
-  }
-
-  async function register(payload: RegisterPayload) {
-    const data = await api<AuthData>("/auth/register", {
-      method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ username, password }),
     });
     tokenStore.set(data.access, data.refresh);
     setUser(data.user);
@@ -73,10 +54,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function logout() {
     try {
       if (tokenStore.refresh) {
-        await api("/auth/logout", {
-          method: "POST",
-          body: JSON.stringify({ refresh: tokenStore.refresh }),
-        }, true);
+        await api(
+          "/auth/logout",
+          { method: "POST", body: JSON.stringify({ refresh: tokenStore.refresh }) },
+          true,
+        );
       }
     } catch {
       // logout é best-effort; segue limpando o cliente
@@ -86,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

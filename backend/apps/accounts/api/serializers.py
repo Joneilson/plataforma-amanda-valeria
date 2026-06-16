@@ -11,30 +11,8 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "email", "nome", "telefone", "role")
-        read_only_fields = ("id", "role")
-
-
-class RegisterSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(
-        write_only=True, validators=[validate_password], style={"input_type": "password"}
-    )
-    nome = serializers.CharField(max_length=150)
-    telefone = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
-    accept_terms = serializers.BooleanField()
-
-    def validate_email(self, value: str) -> str:
-        if User.objects.filter(email__iexact=value).exists():
-            raise serializers.ValidationError("Já existe uma conta com este e-mail.")
-        return value.lower()
-
-    def validate_accept_terms(self, value: bool) -> bool:
-        if not value:
-            raise serializers.ValidationError(
-                "É necessário aceitar os termos de uso e a política de privacidade."
-            )
-        return value
+        fields = ("id", "username", "email", "nome", "telefone", "role")
+        read_only_fields = ("id", "username", "role")
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):
@@ -61,8 +39,7 @@ class ConsentSerializer(serializers.ModelSerializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """Inclui os dados do usuário (e o papel) na resposta do login,
-    evitando uma chamada extra ao /api/me logo após autenticar."""
+    """Inclui os dados do usuário (e o papel) na resposta do login."""
 
     def validate(self, attrs):
         data = super().validate(attrs)

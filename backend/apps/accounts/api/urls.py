@@ -8,16 +8,14 @@ from .views import (
     MeView,
     PasswordResetConfirmView,
     PasswordResetRequestView,
-    RegisterView,
 )
 
 app_name = "accounts"
 
 urlpatterns = [
-    # Autenticação
+    # Autenticação (login por username — contas criadas pela psicóloga)
     path("auth/login", LoginView.as_view(), name="login"),
     path("auth/refresh", TokenRefreshView.as_view(), name="refresh"),
-    path("auth/register", RegisterView.as_view(), name="register"),
     path("auth/logout", LogoutView.as_view(), name="logout"),
     path("auth/password-reset", PasswordResetRequestView.as_view(), name="password-reset"),
     path(

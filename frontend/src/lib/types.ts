@@ -2,7 +2,8 @@ export type Role = "PACIENTE" | "PSICOLOGA";
 
 export interface User {
   id: number;
-  email: string;
+  username: string;
+  email: string | null;
   nome: string;
   telefone: string;
   role: Role;

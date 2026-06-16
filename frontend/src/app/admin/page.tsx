@@ -7,7 +7,7 @@ import type { AdminMetrics } from "@/lib/types";
 
 function Card({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-xl border border-plum-200 bg-white p-5">
+    <div className="rounded-xl border border-plum-200 bg-white p-5 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card">
       <p className="text-sm text-ink/60">{label}</p>
       <p className="mt-1 font-display text-3xl text-plum">{value}</p>
     </div>
@@ -18,7 +18,7 @@ function ModalidadeBar({ online, presencial }: { online: number; presencial: num
   const total = online + presencial;
   const pct = (n: number) => (total === 0 ? 0 : Math.round((n / total) * 100));
   return (
-    <div className="rounded-xl border border-plum-200 bg-white p-5">
+    <div className="rounded-xl border border-plum-200 bg-white p-5 shadow-soft">
       <p className="mb-3 text-sm text-ink/60">Atendimentos: online vs. presencial</p>
       {total === 0 ? (
         <p className="text-sm text-ink/50">Ainda sem atendimentos realizados.</p>

@@ -1,3 +1,4 @@
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from apps.accounts.api.serializers import UserSerializer
@@ -26,9 +27,12 @@ class PatientSerializer(serializers.ModelSerializer):
 
 
 class PatientCreateSerializer(serializers.Serializer):
-    # Dados da conta
-    email = serializers.EmailField()
+    # Conta (login gerado automaticamente; senha definida pela psicóloga)
     nome = serializers.CharField(max_length=150)
+    password = serializers.CharField(
+        write_only=True, validators=[validate_password], style={"input_type": "password"}
+    )
+    email = serializers.EmailField(required=False, allow_blank=True, allow_null=True)
     telefone = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
     # Dados clínicos
     data_nascimento = serializers.DateField(required=False, allow_null=True)

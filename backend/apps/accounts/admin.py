@@ -4,27 +4,16 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import Consent, User
 
 
-@admin.register(Consent)
-class ConsentAdmin(admin.ModelAdmin):
-    list_display = ("user", "tipo", "versao", "created_at", "ip")
-    list_filter = ("tipo", "versao")
-    search_fields = ("user__email",)
-    readonly_fields = ("user", "tipo", "versao", "ip", "created_at", "updated_at")
-
-    def has_add_permission(self, request):
-        return False
-
-
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    ordering = ("email",)
-    list_display = ("email", "nome", "role", "is_staff", "is_active")
+    ordering = ("username",)
+    list_display = ("username", "nome", "role", "is_staff", "is_active")
     list_filter = ("role", "is_staff", "is_active")
-    search_fields = ("email", "nome")
+    search_fields = ("username", "nome", "email")
 
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
-        ("Pessoal", {"fields": ("nome", "telefone", "role")}),
+        (None, {"fields": ("username", "password")}),
+        ("Pessoal", {"fields": ("nome", "email", "telefone", "role")}),
         ("Permissões", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         ("Datas", {"fields": ("last_login", "date_joined")}),
     )
@@ -33,7 +22,18 @@ class UserAdmin(BaseUserAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("email", "nome", "role", "password1", "password2"),
+                "fields": ("username", "nome", "role", "password1", "password2"),
             },
         ),
     )
+
+
+@admin.register(Consent)
+class ConsentAdmin(admin.ModelAdmin):
+    list_display = ("user", "tipo", "versao", "created_at", "ip")
+    list_filter = ("tipo", "versao")
+    search_fields = ("user__nome", "user__username")
+    readonly_fields = ("user", "tipo", "versao", "ip", "created_at", "updated_at")
+
+    def has_add_permission(self, request):
+        return False

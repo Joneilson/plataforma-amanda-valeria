@@ -31,9 +31,11 @@ class PatientViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
         patient = PatientService.create_with_account(
-            email=data.pop("email"),
             nome=data.pop("nome"),
+            password=data.pop("password"),
+            email=data.pop("email", None),
             telefone=data.pop("telefone", ""),
+            request=request,
             **data,
         )
         return Response(PatientSerializer(patient).data, status=status.HTTP_201_CREATED)

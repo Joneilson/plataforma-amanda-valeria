@@ -11,7 +11,7 @@ import {
   setAppointmentStatus,
 } from "@/lib/resources";
 import type { Appointment, AppointmentStatus, Modalidade, Patient } from "@/lib/types";
-import { compactButtonClass, errorBoxClass, inputClass, labelClass } from "@/lib/ui";
+import { cardClass, compactButtonClass, errorBoxClass, inputClass, labelClass } from "@/lib/ui";
 
 const STATUS: AppointmentStatus[] = ["AGENDADA", "CONFIRMADA", "REALIZADA", "FALTA", "CANCELADA"];
 
@@ -82,7 +82,7 @@ export default function AgendaPage() {
       )}
 
       {showForm && (
-        <form onSubmit={handleCreate} className="mt-6 grid gap-4 rounded-xl border border-plum-200 bg-white p-6 sm:grid-cols-2">
+        <form onSubmit={handleCreate} className={`mt-6 grid gap-4 p-6 sm:grid-cols-2 ${cardClass}`}>
           {error && <p className={`${errorBoxClass} sm:col-span-2`}>{error}</p>}
           <div>
             <label className={labelClass}>Paciente</label>
@@ -118,7 +118,7 @@ export default function AgendaPage() {
         </form>
       )}
 
-      <div className="mt-6 overflow-x-auto rounded-xl border border-plum-200 bg-white">
+      <div className={`mt-6 overflow-x-auto ${cardClass}`}>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-plum-200 text-left text-ink/60">
@@ -133,7 +133,7 @@ export default function AgendaPage() {
               <tr><td colSpan={4} className="px-4 py-6 text-center text-ink/50">Nenhum atendimento.</td></tr>
             ) : (
               appointments.map((a) => (
-                <tr key={a.id} className="border-b border-plum-200/50 last:border-0">
+                <tr key={a.id} className="border-b border-plum-200/50 transition-colors last:border-0 hover:bg-sand-light">
                   <td className="px-4 py-3 text-ink">{a.patient_nome}</td>
                   <td className="px-4 py-3 text-ink/70">{formatDateTime(a.data_hora)}</td>
                   <td className="px-4 py-3 text-ink/70">{a.modalidade === "ONLINE" ? "Online" : "Presencial"}</td>

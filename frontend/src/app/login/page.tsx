@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthCard } from "@/components/AuthCard";
@@ -10,7 +9,7 @@ import { errorBoxClass, inputClass, labelClass, primaryButtonClass } from "@/lib
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,10 +19,10 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const user = await login(email, password);
+      const user = await login(username.trim(), password);
       router.replace(homePathForRole(user.role));
     } catch {
-      setError("E-mail ou senha incorretos.");
+      setError("Usuário ou senha incorretos.");
       setLoading(false);
     }
   }
@@ -33,9 +32,10 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <p className={errorBoxClass}>{error}</p>}
         <div>
-          <label className={labelClass} htmlFor="email">E-mail</label>
-          <input id="email" type="email" required autoComplete="email" className={inputClass}
-            value={email} onChange={(e) => setEmail(e.target.value)} />
+          <label className={labelClass} htmlFor="username">Usuário</label>
+          <input id="username" type="text" required autoComplete="username" className={inputClass}
+            placeholder="nome.sobrenome" value={username}
+            onChange={(e) => setUsername(e.target.value)} />
         </div>
         <div>
           <label className={labelClass} htmlFor="password">Senha</label>
@@ -47,15 +47,9 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <div className="mt-6 space-y-2 text-center text-sm text-ink/70">
-        <p>
-          <Link href="/recuperar-senha" className="hover:text-plum">Esqueci minha senha</Link>
-        </p>
-        <p>
-          Não tem conta?{" "}
-          <Link href="/cadastro" className="text-plum hover:underline">Criar conta</Link>
-        </p>
-      </div>
+      <p className="mt-6 text-center text-xs text-ink/50">
+        O acesso é criado pela psicóloga. Em caso de dúvida, entre em contato.
+      </p>
     </AuthCard>
   );
 }

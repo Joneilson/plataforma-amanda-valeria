@@ -1,4 +1,7 @@
 """Camada de serviços de `accounts` — lógica de escrita."""
+import re
+import unicodedata
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -9,46 +12,25 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework.exceptions import ValidationError
 
 from apps.audit.models import AuditLog
-from apps.audit.services import get_client_ip, log_event
-
-from .models import Consent
+from apps.audit.services import log_event
 
 User = get_user_model()
 
 
-class AccountService:
-    """Operações de criação/alteração de contas."""
+def generate_username(nome: str) -> str:
+    """Gera um login no padrão `primeironome.ultimosobrenome`, único."""
+    parts = [p for p in nome.strip().split() if p]
+    first = parts[0] if parts else "usuario"
+    last = parts[-1] if len(parts) > 1 else ""
+    base = f"{first}.{last}" if last else first
+    base = unicodedata.normalize("NFKD", base).encode("ascii", "ignore").decode("ascii").lower()
+    base = re.sub(r"[^a-z0-9.]", "", base) or "usuario"
 
-    @staticmethod
-    @transaction.atomic
-    def register_patient(*, email, password, nome, telefone="", request=None) -> User:
-        """Cria um usuário paciente e registra os consentimentos obrigatórios.
-
-        O perfil clínico (apps.patients) é criado na Fase 3.
-        """
-        user = User.objects.create_user(
-            email=email,
-            password=password,
-            nome=nome,
-            telefone=telefone,
-            role=User.Role.PACIENTE,
-        )
-
-        ip = get_client_ip(request)
-        Consent.objects.bulk_create(
-            [
-                Consent(user=user, tipo=tipo, ip=ip)
-                for tipo in (Consent.Type.TERMS, Consent.Type.PRIVACY)
-            ]
-        )
-
-        # Cria o perfil clínico do paciente (import tardio evita acoplamento no carregamento).
-        from apps.patients.services import PatientService
-
-        PatientService.ensure_profile(user)
-
-        log_event(action=AuditLog.Action.REGISTER, request=request, user=user)
-        return user
+    candidate, i = base, 1
+    while User.objects.filter(username=candidate).exists():
+        i += 1
+        candidate = f"{base}{i}"
+    return candidate
 
 
 class PasswordResetService:
@@ -56,10 +38,8 @@ class PasswordResetService:
 
     @staticmethod
     def request_reset(*, email: str, request=None) -> None:
-        """Envia o link de redefinição. Responde igual exista ou não a conta
-        (não revela se o e-mail está cadastrado)."""
         user = User.objects.filter(email__iexact=email, is_active=True).first()
-        if not user:
+        if not user or not user.email:
             return
 
         uid = urlsafe_base64_encode(force_bytes(user.pk))

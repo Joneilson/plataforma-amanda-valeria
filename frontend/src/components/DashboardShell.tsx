@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import logoHorizontal from "@/assets/logo-horizontal.png";
+import logoStacked from "@/assets/logo-stacked.png";
 import { useAuth } from "@/lib/auth";
 import type { Role } from "@/lib/types";
 import { RequireAuth } from "./RequireAuth";
@@ -34,8 +34,10 @@ const NAV: Record<Role, NavItem[]> = {
 function Sidebar({ role }: { role: Role }) {
   const pathname = usePathname();
   return (
-    <aside className="hidden w-60 shrink-0 flex-col border-r border-plum-200 bg-white px-4 py-6 md:flex">
-      <Image src={logoHorizontal} alt="Amanda Valéria" priority className="mb-8 h-12 w-auto" />
+    <aside className="hidden w-60 shrink-0 flex-col border-r border-plum-200 bg-white px-4 py-6 shadow-soft md:flex">
+      <Link href={role === "PSICOLOGA" ? "/admin" : "/paciente"} className="mx-auto mb-8 block w-28">
+        <Image src={logoStacked} alt="Amanda Valéria" priority className="h-auto w-28" />
+      </Link>
       <nav className="flex flex-col gap-1">
         {NAV[role].map((item) =>
           item.soon ? (
@@ -44,13 +46,14 @@ function Sidebar({ role }: { role: Role }) {
               className="cursor-default rounded-lg px-3 py-2 text-sm text-ink/35"
               title="Em breve"
             >
-              {item.label} <span className="text-[10px] uppercase tracking-wide">· em breve</span>
+              {item.label}
+              <span className="ml-1 text-[10px] uppercase tracking-wide">· em breve</span>
             </span>
           ) : (
             <Link
               key={item.href}
               href={item.href}
-              className={`rounded-lg px-3 py-2 text-sm transition ${
+              className={`rounded-lg px-3 py-2 text-sm transition-colors duration-200 ${
                 pathname === item.href
                   ? "bg-plum-200 font-medium text-plum"
                   : "text-ink/70 hover:bg-sand"
@@ -73,11 +76,11 @@ function TopBar() {
     router.replace("/login");
   }
   return (
-    <header className="flex items-center justify-end gap-4 border-b border-plum-200 bg-white px-6 py-3">
+    <header className="flex items-center justify-end gap-4 border-b border-plum-200 bg-white px-6 py-3 shadow-soft">
       <span className="text-sm text-ink/70">{user?.nome}</span>
       <button
         onClick={handleLogout}
-        className="rounded-full border border-plum-400 px-4 py-1.5 font-brand text-xs uppercase tracking-widest text-plum transition hover:bg-plum-200"
+        className="rounded-full border border-plum-400 px-4 py-1.5 font-brand text-xs uppercase tracking-widest text-plum transition-all duration-200 hover:bg-plum-200 active:scale-[0.98]"
       >
         Sair
       </button>
@@ -92,7 +95,9 @@ export function DashboardShell({ role, children }: { role: Role; children: React
         <Sidebar role={role} />
         <div className="flex min-w-0 flex-1 flex-col">
           <TopBar />
-          <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">{children}</main>
+          <main className="mx-auto w-full max-w-5xl flex-1 animate-fade-up px-6 py-8">
+            {children}
+          </main>
         </div>
       </div>
     </RequireAuth>
