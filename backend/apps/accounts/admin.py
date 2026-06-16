@@ -1,7 +1,18 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User
+from .models import Consent, User
+
+
+@admin.register(Consent)
+class ConsentAdmin(admin.ModelAdmin):
+    list_display = ("user", "tipo", "versao", "created_at", "ip")
+    list_filter = ("tipo", "versao")
+    search_fields = ("user__email",)
+    readonly_fields = ("user", "tipo", "versao", "ip", "created_at", "updated_at")
+
+    def has_add_permission(self, request):
+        return False
 
 
 @admin.register(User)
