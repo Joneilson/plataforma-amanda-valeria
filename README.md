@@ -58,7 +58,8 @@ docker compose exec backend python manage.py createsuperuser
 
 ## Roadmap
 
-Plano em 8 fases (ver `docs/ARQUITETURA.md`). MVP ao fim da Fase 3.
-Estado atual: **Fase 1 — autenticação** concluída (registro, login JWT,
-logout com blacklist, recuperação de senha, consentimento LGPD/CFP, auditoria;
-telas de auth e áreas protegidas por papel no frontend).
+Plano em 8 fases (ver `docs/ARQUITETURA.md`).
+Estado atual: **Fase 3 — núcleo** concluída → **MVP funcional**. Inclui:
+gestão de pacientes (CRUD), agenda/agendamentos com transição de status,
+dashboard de métricas da psicóloga e dashboard do paciente (próximo atendimento),
+com menu lateral e áreas protegidas por papel.
