@@ -9,7 +9,9 @@ import type {
   MoodLevel,
   Patient,
   PatientDashboard,
+  PatientNote,
   PatientStatus,
+  SharedNote,
 } from "./types";
 
 // ---- Dashboards ----
@@ -82,3 +84,23 @@ export const saveMood = (payload: SaveMoodPayload) =>
 
 export const getMoodInsights = (dias = 30) =>
   api<MoodInsights>(`/mood/insights?dias=${dias}`, {}, true);
+
+// ---- Anotações pessoais ----
+export interface SaveNotePayload {
+  titulo?: string;
+  conteudo: string;
+  compartilhar_com_psicologa?: boolean;
+}
+
+export const listNotes = () => api<PatientNote[]>("/notes", {}, true);
+
+export const createNote = (payload: SaveNotePayload) =>
+  api<PatientNote>("/notes", { method: "POST", body: JSON.stringify(payload) }, true);
+
+export const updateNote = (id: number, payload: SaveNotePayload) =>
+  api<PatientNote>(`/notes/${id}`, { method: "PATCH", body: JSON.stringify(payload) }, true);
+
+export const deleteNote = (id: number) =>
+  api<void>(`/notes/${id}`, { method: "DELETE" }, true);
+
+export const listSharedNotes = () => api<SharedNote[]>("/shared-notes", {}, true);

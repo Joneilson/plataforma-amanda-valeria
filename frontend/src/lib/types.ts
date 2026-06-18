@@ -92,3 +92,22 @@ export interface MoodInsights {
   total_registros: number;
   dias: number;
 }
+
+export interface PatientNote {
+  id: number;
+  titulo: string;
+  conteudo: string;
+  compartilhar_com_psicologa: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SharedNote {
+  id: number;
+  patient: number;
+  patient_nome: string;
+  titulo: string;
+  conteudo: string;
+  created_at: string;
+  updated_at: string;
+}
