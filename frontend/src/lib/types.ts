@@ -111,3 +111,18 @@ export interface SharedNote {
   created_at: string;
   updated_at: string;
 }
+
+export type HomeworkStatus = "PENDENTE" | "CONCLUIDA";
+
+export interface Homework {
+  id: number;
+  patient: number;
+  patient_nome: string;
+  criado_por_nome: string;
+  titulo: string;
+  descricao: string;
+  prazo: string | null;
+  status: HomeworkStatus;
+  concluida_em: string | null;
+  created_at: string;
+}

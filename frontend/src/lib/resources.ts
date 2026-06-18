@@ -4,6 +4,7 @@ import type {
   Appointment,
   AppointmentStatus,
   Modalidade,
+  Homework,
   MoodEntry,
   MoodInsights,
   MoodLevel,
@@ -104,3 +105,27 @@ export const deleteNote = (id: number) =>
   api<void>(`/notes/${id}`, { method: "DELETE" }, true);
 
 export const listSharedNotes = () => api<SharedNote[]>("/shared-notes", {}, true);
+
+// ---- Tarefas terapêuticas ----
+export interface CreateHomeworkPayload {
+  patient: number;
+  titulo: string;
+  descricao?: string;
+  prazo?: string | null;
+}
+
+export const listHomework = (patientId?: number) =>
+  api<Homework[]>(`/homework${patientId ? `?patient=${patientId}` : ""}`, {}, true);
+
+export const createHomework = (payload: CreateHomeworkPayload) =>
+  api<Homework>("/homework", { method: "POST", body: JSON.stringify(payload) }, true);
+
+export const deleteHomework = (id: number) =>
+  api<void>(`/homework/${id}`, { method: "DELETE" }, true);
+
+export const completeHomework = (id: number, concluida = true) =>
+  api<Homework>(
+    `/homework/${id}/concluir`,
+    { method: "POST", body: JSON.stringify({ concluida }) },
+    true,
+  );
