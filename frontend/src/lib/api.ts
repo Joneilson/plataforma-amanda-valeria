@@ -6,13 +6,27 @@ export class ApiError extends Error {
   status: number;
   data: unknown;
   constructor(status: number, data: unknown) {
-    const detail =
-      data && typeof data === "object" && "detail" in data
-        ? String((data as { detail: unknown }).detail)
-        : `Erro ${status}`;
-    super(detail);
+    super(ApiError.extractMessage(status, data));
     this.status = status;
     this.data = data;
+  }
+
+  /**
+   * Extrai uma mensagem legível da resposta de erro. O DRF retorna `detail`
+   * para erros gerais, mas erros de validação vêm por campo
+   * (ex.: `{"password": ["Senha muito curta."]}`).
+   */
+  private static extractMessage(status: number, data: unknown): string {
+    if (!data || typeof data !== "object") return `Erro ${status}`;
+    const obj = data as Record<string, unknown>;
+    if (typeof obj.detail === "string") return obj.detail;
+
+    const messages: string[] = [];
+    for (const value of Object.values(obj)) {
+      if (Array.isArray(value)) messages.push(...value.map(String));
+      else if (typeof value === "string") messages.push(value);
+    }
+    return messages.length ? messages.join(" ") : `Erro ${status}`;
   }
 }
 

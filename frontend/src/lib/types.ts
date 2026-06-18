@@ -59,3 +59,36 @@ export interface PatientDashboard {
   proximo_atendimento: Appointment | null;
   sessoes_realizadas: number;
 }
+
+export type MoodLevel = 1 | 2 | 3 | 4 | 5;
+
+export interface MoodEntry {
+  id: number;
+  data: string;
+  nivel: MoodLevel;
+  nivel_display: string;
+  emocoes: string[];
+  anotacao: string;
+  created_at: string;
+}
+
+export interface MoodDayRegistro {
+  hora: string;
+  nivel: MoodLevel;
+  nivel_display: string;
+  emocoes: string[];
+  anotacao: string;
+}
+
+export interface MoodDay {
+  data: string;
+  media: number;
+  registros: MoodDayRegistro[];
+}
+
+export interface MoodInsights {
+  serie: MoodDay[];
+  media: number | null;
+  total_registros: number;
+  dias: number;
+}

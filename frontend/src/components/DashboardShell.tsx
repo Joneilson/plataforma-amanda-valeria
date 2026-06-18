@@ -25,7 +25,7 @@ const NAV: Record<Role, NavItem[]> = {
   PACIENTE: [
     { href: "/paciente", label: "Início" },
     { href: "/paciente/agenda", label: "Minha agenda" },
-    { href: "#", label: "Humor diário", soon: true },
+    { href: "/paciente/humor", label: "Humor diário" },
     { href: "#", label: "Anotações", soon: true },
     { href: "#", label: "Atendimento online", soon: true },
   ],

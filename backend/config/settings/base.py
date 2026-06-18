@@ -13,6 +13,9 @@ env = environ.Env()
 environ.Env.read_env(BASE_DIR.parent / ".env")
 
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="insecure-dev-key-change-me")
+# Chave Fernet (base64 urlsafe, 32 bytes) para cifrar campos clínicos sensíveis.
+# Sem valor, deriva-se da SECRET_KEY (apenas dev). Em produção, defina sempre.
+FIELD_ENCRYPTION_KEY = env("FIELD_ENCRYPTION_KEY", default="")
 DEBUG = env.bool("DJANGO_DEBUG", default=False)
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 

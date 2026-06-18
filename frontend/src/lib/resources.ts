@@ -4,6 +4,9 @@ import type {
   Appointment,
   AppointmentStatus,
   Modalidade,
+  MoodEntry,
+  MoodInsights,
+  MoodLevel,
   Patient,
   PatientDashboard,
   PatientStatus,
@@ -34,6 +37,15 @@ export const listPatients = (search?: string) =>
 export const createPatient = (payload: CreatePatientPayload) =>
   api<Patient>("/patients", { method: "POST", body: JSON.stringify(payload) }, true);
 
+export interface UpdatePatientPayload {
+  queixa_principal?: string;
+  valor_sessao?: number | null;
+  status?: PatientStatus;
+}
+
+export const updatePatient = (id: number, payload: UpdatePatientPayload) =>
+  api<Patient>(`/patients/${id}`, { method: "PATCH", body: JSON.stringify(payload) }, true);
+
 export const updatePatientStatus = (id: number, status: PatientStatus) =>
   api<Patient>(`/patients/${id}`, { method: "PATCH", body: JSON.stringify({ status }) }, true);
 
@@ -54,3 +66,19 @@ export const createAppointment = (payload: CreateAppointmentPayload) =>
 
 export const setAppointmentStatus = (id: number, status: AppointmentStatus) =>
   api<Appointment>(`/appointments/${id}`, { method: "PATCH", body: JSON.stringify({ status }) }, true);
+
+// ---- Humor diário ----
+export interface SaveMoodPayload {
+  nivel: MoodLevel;
+  emocoes?: string[];
+  anotacao?: string;
+  data?: string;
+}
+
+export const listMoodEntries = () => api<MoodEntry[]>("/mood", {}, true);
+
+export const saveMood = (payload: SaveMoodPayload) =>
+  api<MoodEntry>("/mood", { method: "POST", body: JSON.stringify(payload) }, true);
+
+export const getMoodInsights = (dias = 30) =>
+  api<MoodInsights>(`/mood/insights?dias=${dias}`, {}, true);
