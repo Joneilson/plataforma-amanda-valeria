@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { DashboardShell } from "@/components/DashboardShell";
 import { formatDateTime } from "@/lib/format";
 import { listAppointments } from "@/lib/resources";
 import type { Appointment } from "@/lib/types";
+
+function isUpcoming(dataHora: string) {
+  const diff = new Date(dataHora).getTime() - Date.now();
+  return diff > -30 * 60 * 1000 && diff < 2 * 60 * 60 * 1000;
+}
 
 const STATUS_LABEL: Record<string, string> = {
   AGENDADA: "Agendada",
@@ -32,17 +38,28 @@ export default function PacienteAgenda() {
               <th className="px-4 py-3 font-medium">Data/hora</th>
               <th className="px-4 py-3 font-medium">Modalidade</th>
               <th className="px-4 py-3 font-medium">Status</th>
+              <th className="px-4 py-3 font-medium"></th>
             </tr>
           </thead>
           <tbody>
             {appointments.length === 0 ? (
-              <tr><td colSpan={3} className="px-4 py-6 text-center text-ink/50">Nenhum atendimento.</td></tr>
+              <tr><td colSpan={4} className="px-4 py-6 text-center text-ink/50">Nenhum atendimento.</td></tr>
             ) : (
               appointments.map((a) => (
                 <tr key={a.id} className="border-b border-plum-200/50 transition-colors last:border-0 hover:bg-sand-light">
                   <td className="px-4 py-3 text-ink">{formatDateTime(a.data_hora)}</td>
                   <td className="px-4 py-3 text-ink/70">{a.modalidade === "ONLINE" ? "Online" : "Presencial"}</td>
                   <td className="px-4 py-3 text-ink/70">{STATUS_LABEL[a.status]}</td>
+                  <td className="px-4 py-3">
+                    {a.modalidade === "ONLINE" && isUpcoming(a.data_hora) && (
+                      <Link
+                        href={`/paciente/sessao/${a.id}`}
+                        className="rounded-full bg-plum px-3 py-1 text-xs font-medium text-white transition-opacity hover:opacity-80"
+                      >
+                        Entrar na sala
+                      </Link>
+                    )}
+                  </td>
                 </tr>
               ))
             )}

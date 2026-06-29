@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { DashboardShell } from "@/components/DashboardShell";
 import { ApiError } from "@/lib/api";
 import { formatDateTime } from "@/lib/format";
@@ -12,6 +13,11 @@ import {
 } from "@/lib/resources";
 import type { Appointment, AppointmentStatus, Modalidade, Patient } from "@/lib/types";
 import { cardClass, compactButtonClass, errorBoxClass, inputClass, labelClass } from "@/lib/ui";
+
+function isUpcoming(dataHora: string) {
+  const diff = new Date(dataHora).getTime() - Date.now();
+  return diff > -30 * 60 * 1000 && diff < 2 * 60 * 60 * 1000;
+}
 
 const STATUS: AppointmentStatus[] = ["AGENDADA", "CONFIRMADA", "REALIZADA", "FALTA", "CANCELADA"];
 
@@ -126,11 +132,12 @@ export default function AgendaPage() {
               <th className="px-4 py-3 font-medium">Data/hora</th>
               <th className="px-4 py-3 font-medium">Modalidade</th>
               <th className="px-4 py-3 font-medium">Status</th>
+              <th className="px-4 py-3 font-medium"></th>
             </tr>
           </thead>
           <tbody>
             {appointments.length === 0 ? (
-              <tr><td colSpan={4} className="px-4 py-6 text-center text-ink/50">Nenhum atendimento.</td></tr>
+              <tr><td colSpan={5} className="px-4 py-6 text-center text-ink/50">Nenhum atendimento.</td></tr>
             ) : (
               appointments.map((a) => (
                 <tr key={a.id} className="border-b border-plum-200/50 transition-colors last:border-0 hover:bg-sand-light">
@@ -142,6 +149,16 @@ export default function AgendaPage() {
                       className="rounded-md border border-plum-200 bg-white px-2 py-1 text-sm">
                       {STATUS.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
+                  </td>
+                  <td className="px-4 py-3">
+                    {a.modalidade === "ONLINE" && isUpcoming(a.data_hora) && (
+                      <Link
+                        href={`/admin/sessao/${a.id}`}
+                        className="rounded-full bg-plum px-3 py-1 text-xs font-medium text-white transition-opacity hover:opacity-80"
+                      >
+                        Entrar na sala
+                      </Link>
+                    )}
                   </td>
                 </tr>
               ))
