@@ -1,5 +1,24 @@
 """Camada de serviços de `clinical` — lógica de ESCRITA (regras de negócio)."""
-from .models import PatientNote
+from .models import ClinicalRecord, PatientNote
+
+
+class ClinicalRecordService:
+    """Operações de escrita sobre evoluções clínicas."""
+
+    @staticmethod
+    def create(patient, *, conteudo: str, appointment=None) -> ClinicalRecord:
+        return ClinicalRecord.objects.create(
+            patient=patient,
+            conteudo=conteudo,
+            appointment=appointment,
+        )
+
+    @staticmethod
+    def update(record: ClinicalRecord, **fields) -> ClinicalRecord:
+        for attr, value in fields.items():
+            setattr(record, attr, value)
+        record.save()
+        return record
 
 
 class PatientNoteService:

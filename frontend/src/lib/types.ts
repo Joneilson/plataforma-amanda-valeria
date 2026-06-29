@@ -126,3 +126,36 @@ export interface Homework {
   concluida_em: string | null;
   created_at: string;
 }
+
+export interface ClinicalRecord {
+  id: number;
+  patient: number;
+  appointment: number | null;
+  appointment_data: {
+    id: number;
+    data_hora: string;
+    status: AppointmentStatus;
+  } | null;
+  conteudo: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Message {
+  id: number;
+  remetente: number;
+  remetente_nome: string;
+  remetente_role: Role;
+  conteudo: string;
+  lida: boolean;
+  created_at: string;
+}
+
+export interface Conversation {
+  id: number;
+  patient_id: number;
+  patient_nome: string;
+  last_message: { conteudo: string; created_at: string } | null;
+  unread_count: number;
+  updated_at: string;
+}

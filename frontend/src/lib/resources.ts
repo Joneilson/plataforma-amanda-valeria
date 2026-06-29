@@ -3,8 +3,11 @@ import type {
   AdminMetrics,
   Appointment,
   AppointmentStatus,
+  ClinicalRecord,
+  Conversation,
   Modalidade,
   Homework,
+  Message,
   MoodEntry,
   MoodInsights,
   MoodLevel,
@@ -127,5 +130,31 @@ export const completeHomework = (id: number, concluida = true) =>
   api<Homework>(
     `/homework/${id}/concluir`,
     { method: "POST", body: JSON.stringify({ concluida }) },
+    true,
+  );
+
+// ---- Prontuário clínico ----
+export const listClinicalRecords = (patientId: number) =>
+  api<ClinicalRecord[]>(`/clinical-records?patient=${patientId}`, {}, true);
+
+export const createClinicalRecord = (payload: { patient: number; conteudo: string; appointment?: number | null }) =>
+  api<ClinicalRecord>("/clinical-records", { method: "POST", body: JSON.stringify(payload) }, true);
+
+export const updateClinicalRecord = (id: number, conteudo: string) =>
+  api<ClinicalRecord>(`/clinical-records/${id}`, { method: "PATCH", body: JSON.stringify({ conteudo }) }, true);
+
+export const deleteClinicalRecord = (id: number) =>
+  api<void>(`/clinical-records/${id}`, { method: "DELETE" }, true);
+
+// ---- Chat ----
+export const listConversations = () => api<Conversation[]>("/conversations", {}, true);
+
+export const listMessages = (patientId?: number) =>
+  api<Message[]>(`/messages${patientId ? `?patient=${patientId}` : ""}`, {}, true);
+
+export const sendMessage = (conteudo: string, patientId?: number) =>
+  api<Message>(
+    `/messages${patientId ? `?patient=${patientId}` : ""}`,
+    { method: "POST", body: JSON.stringify({ conteudo }) },
     true,
   );

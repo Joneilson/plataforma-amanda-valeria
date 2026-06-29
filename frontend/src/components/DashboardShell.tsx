@@ -19,9 +19,10 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/admin", label: "Dashboard" },
     { href: "/admin/pacientes", label: "Pacientes" },
     { href: "/admin/agenda", label: "Agenda" },
+    { href: "/admin/prontuario", label: "Prontuário" },
     { href: "/admin/anotacoes", label: "Anotações" },
     { href: "/admin/tarefas", label: "Tarefas" },
-    { href: "#", label: "Bate-papo", soon: true },
+    { href: "/admin/chat", label: "Chat" },
     { href: "#", label: "Atendimento online", soon: true },
   ],
   PACIENTE: [
@@ -30,6 +31,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/paciente/humor", label: "Humor diário" },
     { href: "/paciente/anotacoes", label: "Anotações" },
     { href: "/paciente/tarefas", label: "Tarefas" },
+    { href: "/paciente/chat", label: "Chat" },
     { href: "#", label: "Atendimento online", soon: true },
     { href: "/paciente/sos", label: "SOS · Apoio" },
   ],
@@ -58,7 +60,7 @@ function Sidebar({ role }: { role: Role }) {
               key={item.href}
               href={item.href}
               className={`rounded-lg px-3 py-2 text-sm transition-colors duration-200 ${
-                pathname === item.href
+                pathname === item.href || (item.href !== "/admin" && item.href !== "/paciente" && pathname.startsWith(item.href))
                   ? "bg-plum-200 font-medium text-plum"
                   : "text-ink/70 hover:bg-sand"
               }`}

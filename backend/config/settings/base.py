@@ -29,6 +29,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 THIRD_PARTY_APPS = [
+    "daphne",
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",

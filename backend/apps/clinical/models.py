@@ -4,6 +4,39 @@ from apps.common.fields import EncryptedTextField
 from apps.common.models import TimeStampedModel
 
 
+class ClinicalRecord(TimeStampedModel):
+    """Evolução clínica registrada pela psicóloga após cada sessão.
+
+    Visível apenas para a psicóloga. O conteúdo é cifrado em repouso.
+    """
+
+    patient = models.ForeignKey(
+        "patients.Patient", on_delete=models.CASCADE, related_name="clinical_records"
+    )
+    appointment = models.OneToOneField(
+        "scheduling.Appointment",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="clinical_record",
+    )
+    conteudo = EncryptedTextField("evolução clínica")
+
+    class Meta:
+        verbose_name = "evolução clínica"
+        verbose_name_plural = "evoluções clínicas"
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(
+                fields=["patient", "-created_at"], name="record_patient_created_idx"
+            )
+        ]
+
+    def __str__(self):
+        date = self.created_at.strftime("%d/%m/%Y") if self.created_at else "?"
+        return f"{self.patient} · {date}"
+
+
 class PatientNote(TimeStampedModel):
     """Anotação pessoal do paciente.
 

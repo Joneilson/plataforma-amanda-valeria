@@ -1,5 +1,10 @@
 """Camada de selectors de `clinical` — lógica de LEITURA (consultas)."""
-from .models import PatientNote
+from .models import ClinicalRecord, PatientNote
+
+
+def records_for(patient):
+    """Evoluções clínicas de um paciente, ordenadas das mais recentes."""
+    return ClinicalRecord.objects.filter(patient=patient).select_related("appointment")
 
 
 def notes_for(patient):

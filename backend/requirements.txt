@@ -6,6 +6,7 @@ django-environ>=0.11
 django-cors-headers>=4.4
 channels>=4.1
 channels-redis>=4.2
+daphne>=4.1
 celery>=5.4
 redis>=5.0
 Pillow>=10.4
