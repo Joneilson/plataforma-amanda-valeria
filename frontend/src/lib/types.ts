@@ -53,6 +53,29 @@ export interface AdminMetrics {
   faltas: number;
   pacientes_ativos: number;
   proximos_7_dias: number;
+  faturamento_mes: number;
+  contas_a_receber: number;
+  pagamentos_pendentes: number;
+}
+
+export type PaymentStatus = "PENDENTE" | "PAGO" | "FALHOU" | "ESTORNADO";
+export type PaymentMetodo = "PIX" | "CARTAO" | "MANUAL";
+
+export interface Payment {
+  id: number;
+  patient: number;
+  patient_nome: string;
+  appointment: number | null;
+  appointment_data_hora: string | null;
+  valor: string;
+  status: PaymentStatus;
+  metodo: PaymentMetodo;
+  provider_payment_id: string;
+  qr_code: string;
+  qr_code_base64: string;
+  link_pagamento: string;
+  pago_em: string | null;
+  created_at: string;
 }
 
 export interface PatientDashboard {
@@ -158,4 +181,12 @@ export interface Conversation {
   last_message: { conteudo: string; created_at: string } | null;
   unread_count: number;
   updated_at: string;
+}
+
+export interface VideoRoom {
+  id: number;
+  room_name: string;
+  room_url: string;
+  token: string;
+  expira_em: string;
 }

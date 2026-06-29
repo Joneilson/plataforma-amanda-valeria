@@ -69,6 +69,26 @@ export default function AdminDashboard() {
             <Card label="Pacientes ativos" value={metrics.pacientes_ativos} />
             <Card label="Próximos 7 dias" value={metrics.proximos_7_dias} />
           </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <div className="rounded-xl border border-green-200 bg-white p-5 shadow-soft">
+              <p className="text-sm text-ink/60">Faturamento do mês</p>
+              <p className="mt-1 font-display text-3xl text-green-700">
+                R$ {metrics.faturamento_mes.toFixed(2).replace(".", ",")}
+              </p>
+            </div>
+            <div className="rounded-xl border border-amber-200 bg-white p-5 shadow-soft">
+              <p className="text-sm text-ink/60">A receber (pendente)</p>
+              <p className="mt-1 font-display text-3xl text-amber-600">
+                R$ {metrics.contas_a_receber.toFixed(2).replace(".", ",")}
+              </p>
+            </div>
+            <div className="rounded-xl border border-plum-200 bg-white p-5 shadow-soft">
+              <p className="text-sm text-ink/60">Cobranças pendentes</p>
+              <p className="mt-1 font-display text-3xl text-plum">{metrics.pagamentos_pendentes}</p>
+            </div>
+          </div>
+
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
             <ModalidadeBar online={metrics.online} presencial={metrics.presencial} />
             <Card label="Faltas" value={metrics.faltas} />

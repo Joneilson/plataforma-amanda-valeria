@@ -23,7 +23,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/admin/anotacoes", label: "Anotações" },
     { href: "/admin/tarefas", label: "Tarefas" },
     { href: "/admin/chat", label: "Chat" },
-    { href: "#", label: "Atendimento online", soon: true },
+    { href: "/admin/pagamentos", label: "Pagamentos" },
   ],
   PACIENTE: [
     { href: "/paciente", label: "Início" },
@@ -32,7 +32,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/paciente/anotacoes", label: "Anotações" },
     { href: "/paciente/tarefas", label: "Tarefas" },
     { href: "/paciente/chat", label: "Chat" },
-    { href: "#", label: "Atendimento online", soon: true },
+    { href: "/paciente/pagamentos", label: "Pagamentos" },
     { href: "/paciente/sos", label: "SOS · Apoio" },
   ],
 };

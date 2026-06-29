@@ -71,7 +71,13 @@ export default function AdminChatConversaPage() {
       });
     };
 
-    return () => ws.close();
+    return () => {
+      ws.onopen = null;
+      ws.onclose = null;
+      ws.onerror = null;
+      ws.onmessage = null;
+      ws.close();
+    };
   }, [conversation]);
 
   useEffect(() => {

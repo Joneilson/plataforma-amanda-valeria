@@ -12,3 +12,4 @@ redis>=5.0
 Pillow>=10.4
 cryptography>=43.0
 gunicorn>=22.0
+qrcode[pil]>=7.4

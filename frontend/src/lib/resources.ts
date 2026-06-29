@@ -15,7 +15,9 @@ import type {
   PatientDashboard,
   PatientNote,
   PatientStatus,
+  Payment,
   SharedNote,
+  VideoRoom,
 } from "./types";
 
 // ---- Dashboards ----
@@ -158,3 +160,23 @@ export const sendMessage = (conteudo: string, patientId?: number) =>
     { method: "POST", body: JSON.stringify({ conteudo }) },
     true,
   );
+
+// ---- Vídeo ----
+export const getVideoRoom = (appointmentId: number) =>
+  api<VideoRoom>(`/video/rooms/${appointmentId}`, { method: "POST" }, true);
+
+// ---- Pagamentos ----
+export const createPayment = (appointmentId: number, metodo: "PIX" | "CARTAO" = "PIX") =>
+  api<Payment>("/payments/checkout", { method: "POST", body: JSON.stringify({ appointment_id: appointmentId, metodo }) }, true);
+
+/** @deprecated use createPayment */
+export const createPixPayment = (appointmentId: number) => createPayment(appointmentId, "PIX");
+
+export const listMyPayments = () =>
+  api<Payment[]>("/payments/my", {}, true);
+
+export const listAllPayments = () =>
+  api<Payment[]>("/payments", {}, true);
+
+export const markPaymentAsPaid = (paymentId: number) =>
+  api<Payment>(`/payments/${paymentId}/marcar-pago`, { method: "POST" }, true);

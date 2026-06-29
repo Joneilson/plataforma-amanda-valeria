@@ -7,6 +7,31 @@ from apps.patients.models import Patient
 from .models import Appointment
 
 
+def _financial_metrics() -> dict:
+    from apps.payments.models import Payment
+
+    now = timezone.now()
+    mes_inicio = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    faturamento_mes = (
+        Payment.objects.filter(status=Payment.Status.PAGO, pago_em__gte=mes_inicio)
+        .aggregate(total=Sum("valor"))["total"]
+        or 0
+    )
+    contas_a_receber = (
+        Payment.objects.filter(status=Payment.Status.PENDENTE)
+        .aggregate(total=Sum("valor"))["total"]
+        or 0
+    )
+    pagamentos_pendentes = Payment.objects.filter(status=Payment.Status.PENDENTE).count()
+
+    return {
+        "faturamento_mes": float(faturamento_mes),
+        "contas_a_receber": float(contas_a_receber),
+        "pagamentos_pendentes": pagamentos_pendentes,
+    }
+
+
 def appointments_for(user):
     """Atendimentos visíveis ao usuário, conforme o papel."""
     qs = Appointment.objects.select_related("patient__user")
@@ -32,7 +57,7 @@ def admin_metrics() -> dict:
     minutos = realizadas.aggregate(total=Sum("duracao_min"))["total"] or 0
     now = timezone.now()
 
-    return {
+    metrics = {
         "atendimentos_realizados": realizadas.count(),
         "horas_atendidas": round(minutos / 60, 1),
         "online": realizadas.filter(modalidade="ONLINE").count(),
@@ -44,3 +69,5 @@ def admin_metrics() -> dict:
             status__in=[Appointment.Status.AGENDADA, Appointment.Status.CONFIRMADA],
         ).count(),
     }
+    metrics.update(_financial_metrics())
+    return metrics

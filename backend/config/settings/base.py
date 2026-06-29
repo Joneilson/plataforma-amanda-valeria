@@ -29,7 +29,6 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 THIRD_PARTY_APPS = [
-    "daphne",
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
@@ -50,7 +49,7 @@ LOCAL_APPS = [
     "apps.notifications",
     "apps.audit",
 ]
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = ["daphne"] + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -136,6 +135,18 @@ CHANNEL_LAYERS = {
 }
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
+
+# ---- Integrações externas ----
+DAILY_API_KEY = env("DAILY_API_KEY", default="")
+BACKEND_URL = env("BACKEND_URL", default="http://localhost:8000")
+
+# Dados PIX do recebedor (conta InfinityPay ou qualquer banco)
+PIX_KEY = env("PIX_KEY", default="")        # chave PIX: email, CPF, telefone ou aleatória
+PIX_TITULAR = env("PIX_TITULAR", default="Amanda Valeria")  # nome exibido no app do pagador
+PIX_CIDADE = env("PIX_CIDADE", default="Recife")            # cidade do recebedor
+
+# Link de pagamento por cartão (gerado no dashboard InfinityPay)
+INFINITYPAY_LINK_CREDITO = env("INFINITYPAY_LINK_CREDITO", default="")
 
 # ---- i18n / fuso ----
 LANGUAGE_CODE = "pt-br"
