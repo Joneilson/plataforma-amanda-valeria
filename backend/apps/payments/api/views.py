@@ -92,3 +92,73 @@ class MarkAsPaidView(APIView):
 
         payment = PixService.mark_as_paid(payment)
         return Response(PaymentSerializer(payment).data)
+
+
+class MonthlyReportView(APIView):
+    """GET /api/reports/monthly?ano=2026&mes=7 — resumo do mês (psicóloga).
+
+    Atendimentos por status + financeiro (recebido no mês, pendências) e
+    detalhamento por paciente. O frontend renderiza em layout imprimível.
+    """
+
+    permission_classes = [IsPsicologa]
+
+    def get(self, request):
+        from django.db.models import Count, Sum
+        from django.utils import timezone
+
+        hoje = timezone.localdate()
+        try:
+            ano = int(request.query_params.get("ano", hoje.year))
+            mes = int(request.query_params.get("mes", hoje.month))
+            if not 1 <= mes <= 12:
+                raise ValueError
+        except (TypeError, ValueError):
+            return Response({"detail": "Parâmetros ano/mes inválidos."}, status=400)
+
+        atendimentos = Appointment.objects.filter(
+            data_hora__year=ano, data_hora__month=mes
+        )
+        por_status = {
+            row["status"]: row["total"]
+            for row in atendimentos.values("status").annotate(total=Count("id"))
+        }
+
+        pagos = Payment.objects.filter(
+            status=Payment.Status.PAGO, pago_em__year=ano, pago_em__month=mes
+        )
+        recebido = pagos.aggregate(total=Sum("valor"))["total"] or 0
+        pendentes = Payment.objects.filter(
+            status=Payment.Status.PENDENTE,
+            appointment__data_hora__year=ano,
+            appointment__data_hora__month=mes,
+        )
+        a_receber = pendentes.aggregate(total=Sum("valor"))["total"] or 0
+
+        por_paciente = [
+            {
+                "paciente": row["patient__user__nome"],
+                "sessoes": row["sessoes"],
+                "valor_pago": f"{row['valor_pago'] or 0:.2f}",
+            }
+            for row in pagos.values("patient__user__nome").annotate(
+                sessoes=Count("id"), valor_pago=Sum("valor")
+            ).order_by("patient__user__nome")
+        ]
+
+        return Response(
+            {
+                "ano": ano,
+                "mes": mes,
+                "atendimentos": {
+                    "total": atendimentos.count(),
+                    "por_status": por_status,
+                },
+                "financeiro": {
+                    "recebido_no_mes": f"{recebido:.2f}",
+                    "a_receber": f"{a_receber:.2f}",
+                    "pagamentos_pendentes": pendentes.count(),
+                },
+                "por_paciente": por_paciente,
+            }
+        )

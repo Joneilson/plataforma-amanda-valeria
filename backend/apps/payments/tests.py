@@ -8,6 +8,7 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 
 from apps.patients.models import Patient
+from apps.payments.models import Payment
 from apps.payments.services import PixService, _build_pix_payload, _crc16
 from apps.scheduling.models import Appointment
 
@@ -125,3 +126,48 @@ class PaymentAPIPermissionTests(TestCase):
         self.client.force_authenticate(self.paciente_a.user)
         resp = self.client.post(f"/api/payments/{payment.pk}/marcar-pago")
         self.assertEqual(resp.status_code, 403)
+
+
+class MonthlyReportTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        from django.utils import timezone as tz
+
+        cls.psicologa = User.objects.create_user(
+            username="amanda", password="x", nome="Amanda Valeria", role=User.Role.PSICOLOGA
+        )
+        cls.paciente = _make_paciente("ana.silva", "Ana Silva")
+        apt = _make_appointment(cls.paciente)
+        payment = Payment.objects.create(
+            appointment=apt,
+            patient=cls.paciente,
+            valor=Decimal("150.00"),
+            status=Payment.Status.PAGO,
+            pago_em=tz.now(),
+        )
+        cls.payment = payment
+
+    def setUp(self):
+        cache.clear()
+        self.client = APIClient()
+
+    def test_psicologa_ve_resumo_do_mes(self):
+        from django.utils import timezone as tz
+
+        hoje = tz.localdate()
+        self.client.force_authenticate(self.psicologa)
+        resp = self.client.get(f"/api/reports/monthly?ano={hoje.year}&mes={hoje.month}")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["atendimentos"]["total"], 1)
+        self.assertEqual(resp.data["financeiro"]["recebido_no_mes"], "150.00")
+        self.assertEqual(resp.data["por_paciente"][0]["paciente"], "Ana Silva")
+
+    def test_paciente_nao_acessa_relatorio(self):
+        self.client.force_authenticate(self.paciente.user)
+        resp = self.client.get("/api/reports/monthly")
+        self.assertEqual(resp.status_code, 403)
+
+    def test_mes_invalido_retorna_400(self):
+        self.client.force_authenticate(self.psicologa)
+        resp = self.client.get("/api/reports/monthly?ano=2026&mes=13")
+        self.assertEqual(resp.status_code, 400)

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import logoStacked from "@/assets/logo-stacked.png";
 import { useAuth } from "@/lib/auth";
 import type { Role } from "@/lib/types";
+import { ConsentGate } from "./ConsentGate";
 import { RequireAuth } from "./RequireAuth";
 
 interface NavItem {
@@ -24,6 +25,7 @@ const NAV: Record<Role, NavItem[]> = {
     { href: "/admin/tarefas", label: "Tarefas" },
     { href: "/admin/chat", label: "Chat" },
     { href: "/admin/pagamentos", label: "Pagamentos" },
+    { href: "/admin/relatorio", label: "Relatório" },
   ],
   PACIENTE: [
     { href: "/paciente", label: "Início" },
@@ -106,6 +108,7 @@ export function DashboardShell({ role, children }: { role: Role; children: React
           </main>
         </div>
       </div>
+      {role === "PACIENTE" && <ConsentGate />}
     </RequireAuth>
   );
 }

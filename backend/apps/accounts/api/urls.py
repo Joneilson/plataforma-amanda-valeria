@@ -3,6 +3,8 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     ConsentListView,
+    ConsentPendingView,
+    DataExportView,
     LoginView,
     LogoutView,
     MeView,
@@ -25,5 +27,7 @@ urlpatterns = [
     ),
     # Conta
     path("me", MeView.as_view(), name="me"),
+    path("me/export", DataExportView.as_view(), name="data-export"),
     path("consents", ConsentListView.as_view(), name="consents"),
+    path("consents/pending", ConsentPendingView.as_view(), name="consents-pending"),
 ]

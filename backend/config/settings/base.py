@@ -123,6 +123,7 @@ REST_FRAMEWORK = {
         "login": "10/min",           # força bruta de credenciais
         "password-reset": "5/hour",  # enumeração de e-mails / spam
         "checkout": "30/hour",       # geração de cobranças
+        "export": "5/hour",          # exportação de dados (LGPD)
     },
 }
 
@@ -155,6 +156,12 @@ CHANNEL_LAYERS = {
 }
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_BEAT_SCHEDULE = {
+    "lembretes-de-sessao": {
+        "task": "apps.notifications.tasks.enviar_lembretes_de_sessao",
+        "schedule": 60 * 60,  # a cada hora
+    },
+}
 
 # ---- Integrações externas ----
 DAILY_API_KEY = env("DAILY_API_KEY", default="")

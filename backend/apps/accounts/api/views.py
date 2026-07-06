@@ -8,8 +8,10 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from django.http import JsonResponse
+
 from apps.accounts.models import Consent
-from apps.accounts.services import PasswordResetService
+from apps.accounts.services import ConsentService, DataExportService, PasswordResetService
 from apps.audit.models import AuditLog
 from apps.audit.services import log_event
 
@@ -100,3 +102,36 @@ class ConsentListView(ListAPIView):
 
     def get_queryset(self):
         return Consent.objects.filter(user=self.request.user)
+
+    def post(self, request):
+        """Aceita um consentimento na versão vigente: {"tipo": "PRIVACIDADE"}."""
+        consent = ConsentService.accept(
+            user=request.user, tipo=request.data.get("tipo", ""), request=request
+        )
+        return Response(ConsentSerializer(consent).data, status=status.HTTP_201_CREATED)
+
+
+class ConsentPendingView(APIView):
+    """GET /api/consents/pending — tipos que o usuário ainda precisa aceitar."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({"pendentes": ConsentService.pending_for(request.user)})
+
+
+class DataExportView(APIView):
+    """GET /api/me/export — download JSON dos dados pessoais (LGPD art. 18)."""
+
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "export"
+
+    def get(self, request):
+        data = DataExportService.export_for(request.user, request=request)
+        response = JsonResponse(
+            data, json_dumps_params={"ensure_ascii": False, "indent": 2}
+        )
+        filename = f"meus-dados-{data['gerado_em'][:10]}.json"
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return response

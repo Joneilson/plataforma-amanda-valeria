@@ -64,6 +64,20 @@ async function tryRefresh(): Promise<string | null> {
 }
 
 /**
+ * Baixa um arquivo autenticado da API (ex.: exportação de dados LGPD).
+ * Mesma lógica de refresh do `api()`, mas retorna Blob em vez de JSON.
+ */
+export async function apiDownload(path: string): Promise<Blob> {
+  let res = await rawFetch(path, {}, tokenStore.access);
+  if (res.status === 401) {
+    const newAccess = await tryRefresh();
+    if (newAccess) res = await rawFetch(path, {}, newAccess);
+  }
+  if (!res.ok) throw new ApiError(res.status, null);
+  return res.blob();
+}
+
+/**
  * Faz uma chamada à API. Com `auth = true`, injeta o access token e, em caso
  * de 401, tenta renovar via refresh token uma vez antes de desistir.
  */

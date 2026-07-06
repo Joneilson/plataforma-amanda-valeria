@@ -34,3 +34,9 @@ yarn-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# ---- Backups ----
+backups/
+
+# ---- TypeScript ----
+*.tsbuildinfo

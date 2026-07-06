@@ -16,6 +16,8 @@ class AuditLog(models.Model):
         REGISTER = "REGISTER", "Cadastro"
         PASSWORD_RESET_REQUEST = "PASSWORD_RESET_REQUEST", "Solicitação de redefinição de senha"
         PASSWORD_RESET = "PASSWORD_RESET", "Redefinição de senha"
+        CONSENT_ACCEPTED = "CONSENT_ACCEPTED", "Consentimento aceito"
+        DATA_EXPORT = "DATA_EXPORT", "Exportação de dados pessoais"
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

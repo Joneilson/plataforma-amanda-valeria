@@ -50,6 +50,27 @@ services:
       - backend
       - redis
 
+  beat:
+    build: ./backend
+    command: celery -A config beat -l info
+    env_file: .env
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - backend
+      - redis
+
+  backup:
+    image: mysql:8.0
+    entrypoint: ["/bin/sh", "/backup.sh"]
+    env_file: .env
+    volumes:
+      - ./ops/backup.sh:/backup.sh:ro
+      - ./backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+
   frontend:
     build: ./frontend
     command: npm run dev
