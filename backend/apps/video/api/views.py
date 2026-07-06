@@ -1,3 +1,4 @@
+import logging
 import urllib.error
 
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +10,8 @@ from apps.scheduling.models import Appointment
 from apps.video.services import VideoService
 
 from .serializers import VideoRoomSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class VideoRoomView(APIView):
@@ -49,11 +52,10 @@ class VideoRoomView(APIView):
         try:
             room = VideoService.get_or_create_room(apt)
         except urllib.error.HTTPError as exc:
-            return Response(
-                {"detail": f"Erro ao criar sala no Daily.co: {exc.code} {exc.reason}"},
-                status=502,
-            )
-        except Exception as exc:
-            return Response({"detail": f"Erro ao conectar ao Daily.co: {exc}"}, status=502)
+            logger.error("Daily.co retornou erro HTTP %s %s", exc.code, exc.reason)
+            return Response({"detail": "Erro ao criar sala de vídeo."}, status=502)
+        except Exception:
+            logger.exception("Falha ao conectar ao Daily.co")
+            return Response({"detail": "Erro ao conectar ao serviço de vídeo."}, status=502)
 
         return Response(VideoRoomSerializer(room, context={"request": request}).data)

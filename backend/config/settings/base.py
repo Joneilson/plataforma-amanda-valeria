@@ -112,6 +112,18 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ),
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+        "user": "300/min",
+        # Escopos específicos (ScopedRateThrottle nas views):
+        "login": "10/min",           # força bruta de credenciais
+        "password-reset": "5/hour",  # enumeração de e-mails / spam
+        "checkout": "30/hour",       # geração de cobranças
+    },
 }
 
 SIMPLE_JWT = {
@@ -127,6 +139,14 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Amanda Valéria <nao-res
 
 # ---- Redis / Channels / Celery ----
 REDIS_URL = env("REDIS_URL", default="redis://redis:6379/0")
+# Cache compartilhado entre workers — necessário para o rate limiting valer
+# globalmente (LocMem manteria um contador por processo).
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_URL,
+    }
+}
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",

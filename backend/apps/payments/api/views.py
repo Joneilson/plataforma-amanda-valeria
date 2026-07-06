@@ -1,6 +1,7 @@
 import logging
 
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from apps.accounts.permissions import IsPaciente, IsPsicologa
@@ -19,6 +20,8 @@ class CheckoutPixView(APIView):
     """POST /api/payments/checkout  — gera QR Code PIX para um atendimento."""
 
     permission_classes = [IsPaciente]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "checkout"
 
     def post(self, request):
         appointment_id = request.data.get("appointment_id")

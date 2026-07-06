@@ -9,27 +9,21 @@ from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-from rest_framework_simplejwt.tokens import UntypedToken
+from rest_framework_simplejwt.tokens import AccessToken
 
 User = get_user_model()
 
 
 @database_sync_to_async
 def _get_user(token_key: str):
+    # AccessToken valida assinatura, expiração E o tipo do token — um refresh
+    # token (validade longa) não pode ser usado para abrir WebSocket.
     try:
-        UntypedToken(token_key)
+        token = AccessToken(token_key)
     except (InvalidToken, TokenError):
         return AnonymousUser()
-    from rest_framework_simplejwt.backends import TokenBackend
-    from django.conf import settings
-
-    data = TokenBackend(
-        algorithm=settings.SIMPLE_JWT.get("ALGORITHM", "HS256"),
-        signing_key=settings.SECRET_KEY,
-    ).decode(token_key, verify=True)
-    user_id = data.get("user_id")
     try:
-        return User.objects.get(pk=user_id)
+        return User.objects.get(pk=token.get("user_id"), is_active=True)
     except User.DoesNotExist:
         return AnonymousUser()
 
